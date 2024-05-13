@@ -19,13 +19,30 @@ def fetch_db():
     #grabbing all the ingredients for the random recipe
     cursor.execute("SELECT * FROM " + table_name + ";")
     #storing all the data we grabbed above
-    ingredients = cursor.fetchall()
+    table_records = cursor.fetchall()
 
-    print(ingredients)
-    print(table_name)
     connection.close()
+    return table_name, table_records
+
+def pre_process(table_name, table_records):
+    #title
+    #this is removing the last six numbers at the end of each recipe name
+    title = table_name[:-6]
+    title = "".join([char if char.islower() else "" + char for char in title])
+
+    #ingredients
+    ingredients = []
+    for i in table_records:
+        name = i[1]
+        qty = i[2]
+        unit = i[3]
+        ingredients.append(qty + " " + unit + " of " + name)
+
+    return title, ingredients
 
 def laod_frame1():
+    #this will stack the frames based on relevancy
+    frame1.tkraise()
     #this makes sure the background color stays with the logo on screen
     frame1.pack_propagate(False)
     #widgets for frame1
@@ -55,8 +72,15 @@ def laod_frame1():
 
 
 def load_frame2():
-    fetch_db()
+    frame2.tkraise()
 
+    table_name, table_records = fetch_db()
+    title, ingredients = pre_process(table_name, table_records)
+
+    logo_image = ImageTk.PhotoImage(file = "assets/RRecipe_logo_bottom.png")
+    logo_widget = tk.Label(frame1, image = logo_image, bg = bg_color)
+    logo_widget.image = logo_image
+    logo_widget.pack(padx=10, pady=10)
 
 
 
