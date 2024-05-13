@@ -1,7 +1,29 @@
 import tkinter as tk
 from PIL import ImageTk
+import sqlite3
+from numpy import random
+
 
 bg_color = "#3d6466"
+
+def fetch_db():
+    connection = sqlite3.connect("data/recipes.db")
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM sqlite_schema WHERE type='table';")
+    all_tables = cursor.fetchall()
+    #choosing random number for grabbing recipe
+    idx = random.randint(0, len(all_tables)-1)
+
+    #grab ingredients
+    table_name = all_tables[idx][1]
+    #grabbing all the ingredients for the random recipe
+    cursor.execute("SELECT * FROM " + table_name + ";")
+    #storing all the data we grabbed above
+    ingredients = cursor.fetchall()
+
+    print(ingredients)
+    print(table_name)
+    connection.close()
 
 def laod_frame1():
     #this makes sure the background color stays with the logo on screen
@@ -33,7 +55,7 @@ def laod_frame1():
 
 
 def load_frame2():
-    print('hello world')
+    fetch_db()
 
 
 
