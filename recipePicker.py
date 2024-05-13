@@ -2,9 +2,15 @@ import tkinter as tk
 from PIL import ImageTk
 import sqlite3
 from numpy import random
-
+import pyglet
 
 bg_color = "#3d6466"
+pyglet.font.add_file("fonts/Ubuntu-Bold.ttf")
+pyglet.font.add_file("fonts/Shanti-Regular.ttf")
+
+def clear_widgets(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
 
 def fetch_db():
     connection = sqlite3.connect("data/recipes.db")
@@ -41,6 +47,7 @@ def pre_process(table_name, table_records):
     return title, ingredients
 
 def laod_frame1():
+    clear_widgets(frame2)
     #this will stack the frames based on relevancy
     frame1.tkraise()
     #this makes sure the background color stays with the logo on screen
@@ -55,13 +62,13 @@ def laod_frame1():
     tk.Label(frame1, text = "ready for your random recipe?", 
                         bg = bg_color, 
                         fg = "white",
-                        font = ("TkMenuFont", 14)
+                        font = ("Shanti", 14)
                         ).pack(padx=10, pady=10)
 
     tk.Button(
         frame1,
         text = "SHUFFLE",
-        font = ("TkHeadingFont", 20),
+        font = ("Ubuntu", 20),
         bg = "#28393a",
         fg = "white",
         cursor = "hand2",
@@ -72,32 +79,57 @@ def laod_frame1():
 
 
 def load_frame2():
+    clear_widgets(frame1)
     frame2.tkraise()
 
     table_name, table_records = fetch_db()
     title, ingredients = pre_process(table_name, table_records)
 
     logo_image = ImageTk.PhotoImage(file = "assets/RRecipe_logo_bottom.png")
-    logo_widget = tk.Label(frame1, image = logo_image, bg = bg_color)
+    logo_widget = tk.Label(frame2, image = logo_image, bg = bg_color)
     logo_widget.image = logo_image
     logo_widget.pack(padx=10, pady=10)
 
+    tk.Label(frame2, text = title, 
+                        bg = bg_color, 
+                        fg = "white",
+                        font = ("Shanti", 20)
+                        ).pack(padx=20, pady=20)
+    for i in ingredients:
+        tk.Label(frame2, text = i, 
+                        bg = "#28393a", 
+                        fg = "white",
+                        font = ("Ubuntu", 12)
+                        ).pack(fill = "both")
+
+    tk.Button(
+        frame2,
+        text = "Back",
+        font = ("Ubuntu", 18),
+        bg = "#28393a",
+        fg = "white",
+        cursor = "hand2",
+        activebackground = "#badee2",
+        activeforeground = 'black',
+        command = laod_frame1
+    ).pack(padx=20, pady=10)
 
 
 # initiallize app
 root = tk.Tk()
 root.title("Recipe Picker")
 #places window at the center of the screen
-x = root.winfo_screenwidth() // 2
-y = int(root.winfo_screenheight() * 0.1)
-root.geometry('500x600+' + str(x)+'+' + str(y))
+root.eval("tk::PlaceWindow . center")
+#x = root.winfo_screenwidth() // 2
+#y = int(root.winfo_screenheight() * 0.1)
+#root.geometry('500x600+' + str(x)+'+' + str(y))
 
 #frame widget
 frame1 = tk.Frame(root, width = 500, height = 600, bg = bg_color)
 frame2 = tk.Frame(root,  bg = bg_color)
 
 for frame in (frame1, frame2):
-    frame.grid(row=0, column=0)
+    frame.grid(row=0, column=0, sticky = "nesw")
 
 laod_frame1()
 
